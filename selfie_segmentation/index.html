@@ -38,6 +38,21 @@
         </div>
         <div class="row mb-2 align-items-center">
           <div class="col-1 col-md-4">
+            <span>WebNN Device Type</span>
+          </div>
+          <div class="col-md-auto">
+            <div class="btn-group-toggle" data-toggle="buttons" id="backendBtns">
+              <label class="btn btn-outline-info custom" name="webnn">
+                <input type="radio" name="backend" id="cpu" autocomplete="off">CPU
+              </label>
+              <label class="btn btn-outline-info custom" name="webnn">
+                <input type="radio" name="backend" id="npu" autocomplete="off">NPU
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-2 align-items-center">
+          <div class="col-1 col-md-4">
             <span><a href="https://google.github.io/mediapipe/solutions/selfie_segmentation#models">MediaPipe Selfie Segmentation Model</a></span>
           </div>
           <div class="col-md-auto">

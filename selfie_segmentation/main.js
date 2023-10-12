@@ -18,6 +18,7 @@ let loadTime = 0;
 let computeTime = 0;
 let outputBuffer;
 let modelChanged = false;
+let deviceType = 'cpu';
 let backgroundImageSource = document.getElementById('00-img');
 let backgroundType = 'img'; // 'none', 'blur', 'image'
 const inputOptions = {
@@ -47,9 +48,19 @@ let enableWebnnDelegate = false;
 const disabledSelectors = ['#tabs > li', '.btn'];
 
 $(document).ready(async () => {
+  if (await utils.isWebNN()) {
+    $('#cpu').click();
+  }
   await tf.setBackend('wasm');
   await tf.ready();
   $('.icdisplay').hide();
+});
+
+$('#backendBtns .btn').on('change', async (e) => {
+  modelChanged = true;
+  deviceType = $(e.target).attr('id');
+  if (inputType === 'camera') utils.stopCameraStream(rafReq, stream);
+  await main();
 });
 
 $('input[name="model"]').on('change', async (e) => {
@@ -208,7 +219,9 @@ export async function main() {
     if (modelName === '') return;
     ui.handleClick(disabledSelectors, true);
     if (isFirstTimeLoad) $('#hint').hide();
-    const numRuns = utils.getUrlParams()[0];
+    const urlParams = utils.getUrlParams();
+    const numRuns = urlParams[0];
+    const numThreads = urlParams[2];
     // Only do load() when model first time loads and
     // there's new model or delegate choosed
     if (isFirstTimeLoad || modelChanged) {
@@ -222,7 +235,8 @@ export async function main() {
         action: 'load',
         modelPath: modelConfigs[modelName].modelPath,
         enableWebNNDelegate: enableWebnnDelegate,
-        webNNDevicePreference: 0,
+        webNNDevicePreference: deviceType == 'npu' ? 3 : 0,
+        webNNNumThreads: numThreads ? numThreads : 0,
       };
       loadTime = await postAndListenMessage(options);
       console.log(`  done in ${loadTime} ms.`);
